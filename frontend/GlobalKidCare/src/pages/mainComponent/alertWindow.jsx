@@ -2,7 +2,7 @@ const Alert = ({msg, setMsg}) => {
     const style = msg.show === true ? "flex" : "hidden"
     
     return(
-        <div className={`${style} absolute inset-1/3 inset-y-1/3 lg:w-1/3 md:w-1/2 w-3/4 min-h-[150px] max-h-[200px] p-3 flex-col gap-4 items-center justify-center bg-secondary rounded-xl`}>
+        <div className={`${style} absolute inset-1/3 inset-y-1/3 lg:w-1/3 md:w-1/2 w-3/4 min-h-[150px] max-h-[200px] p-3 flex-col gap-4 items-center justify-center bg-white-100 rounded-xl`}>
             <div className="text-[30px] font-semibold">
                 <h1>Message!!!</h1>
             </div>

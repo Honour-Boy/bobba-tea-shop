@@ -18,17 +18,17 @@ body {
 .input-text {
   box-sizing: border-box;
   height: 50px;
-  border: 1px solid #28AEA3;
+  border: 1px solid #f65151;
   border-radius: 7px;
   padding: 10px;
   margin: 10px 0px 20px 0px;
   background-color: white;
   color: black;
-  outline: #28AEA3;
+  outline: #f65151;
 }
 
 .input-text::placeholder{
-  color: #28AEA3;
+  color: #f65151;
 }
 
 
@@ -42,30 +42,81 @@ label {
 .btn {
   width: 70%;
   height: 45px;
-  background: #28AEA3;
+  background: #f65151;
   color: #ffffff;
-  border: 2px solid #28AEA3;
+  border: 2px solid #f65151;
   border-radius: 7px;
 }
 
 .btn:hover {
   background: #ffffff;
-  color: #28AEA3;
+  color: #f65151;
   transition: all 0.2s ease;
 }
 
-.top{
-  animation: myEntrance 1.5s ease 0s 1 normal forwards;
+.flavor-fruit{
+  animation: myAnim 0.5s ease-in-out normal forwards;
+}
+.txt{
+  font-family: "Roboto";
+  font-size: 24px;
+  line-height: 36px;
+  letter-spacing: normal;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
 }
 
-@keyframes myEntrance {
+.btn1 {
+  font-size: 28px;
+  color: #e1e1e1;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background: none;
+  text-transform: uppercase;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-duration: 400ms;
+  transition-property: color;
+}
+
+.btn1:focus,
+.btn1:hover {
+  color: #fff;
+}
+
+.btn1:focus:after,
+.btn1:hover:after {
+  width: 100%;
+  left: 0%;
+}
+
+.btn1:after {
+  content: "";
+  pointer-events: none;
+  bottom: -2px;
+  left: 50%;
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  background-color: #fff;
+  transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition-duration: 400ms;
+  transition-property: width, left;
+}
+
+@keyframes myAnim {
 	0% {
-		opacity: 0;
-		transform: scale(0.5);
+        opacity: 0;
+        transition: all ease-in-out 0.5s;
+		transform: rotate(0deg);
 	}
 
 	100% {
-		opacity: 1;
-		transform: scale(1);
+        opacity: 1;
+        transition: all ease-in-out 0.5s;
+		transform: rotate(-45deg);
 	}
 }

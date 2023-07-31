@@ -126,14 +126,14 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
   })
 
   const headings = allow ? (
-    <div className="mt-10">
-      <h1 className={`${styles.heroHeadText}`}>Welcome to Global Kids Care!</h1>
+    <div className="mt-20">
+      <h1 className={`${styles.heroHeadText}`}>Welcome to the Bobba!</h1>
       <p className={`${styles.heroSubText} `}>
         Enter your details to get started
       </p>
     </div>
   ) : (
-    <div className="mt-10">
+    <div className="mt-20">
       <h1 className={`${styles.heroHeadText}`}>Welcome Back!</h1>
       <p className={`${styles.heroSubText} `}>
         Enter details to continue to website
@@ -142,19 +142,19 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
   );
 
   return (
-    <div className="flex rounded-2xl min-h-[670px] lg:h-[670px] shadow-card bg-white relative lg:flex-row flex-col  overflow-auto">
-      <form className={`md:w-[550px] w-full ss:mx-2 md:mx-0 ${styles.padding}`}>
-        <img src={logo} className="h-5 inset-0 absolute m-5 w-[140px]" />
+    <div className="flex w-3/4 h-full bg-white-100 lg:flex-row flex-col overflow-auto">
+      <form className={`md:w-[550px] w-full lg:mx-[10%] md:mx-0 ${styles.padding} relative`}>
+        <img src={logo} className="h-fit inset-0 absolute m-5 w-[80px]" />
         {headings}
         <div className="mt-5 flex flex-col gap-5">
-          <button className="border-2 border-[#28AEA3] rounded-2xl p-2 flex gap-1 w-[180px]" onClick={() => login()} >
+          <button className="border-2 border-tertiary text-tertiary rounded-2xl p-5 flex items-center justify-center gap-1 w-full" onClick={() => login()} >
             <img src={google} className="w-6" />
             Log In with Google
           </button>
           <div className="w-full flex items-center justify-center gap-1">
-            <hr className="w-[45%] border-[#28AEA3]" />
-            OR
-            <hr className="w-[45%] border-[#28AEA3]" />
+            <hr className="w-[35%] border-tertiary" />
+            <p className="w-[30%] text-center">or sign in with email</p>
+            <hr className="w-[35%] border-tertiary" />
           </div>
         </div>
         <div className="mt-[20px] w-full">
@@ -163,7 +163,7 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
           </label>
           <input
             type="text"
-            placeholder="Enter Full Name"
+            placeholder="Enter Your Name"
             onChange={Change}
             className={`${
               allow ? "block" : "hidden"
@@ -197,7 +197,7 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
               Have an account?
               <a
                 onClick={() => setAllow(false)}
-                className=" text-[#28AEA3] font-medium w-fit block cursor-pointer"
+                className=" text-tertiary font-medium w-fit block cursor-pointer"
               >
                 Sign in
               </a>
@@ -207,7 +207,7 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
               Don't Have an account?
               <a
                 onClick={() => setAllow(true)}
-                className=" text-[#28AEA3] font-medium w-fit block cursor-pointer"
+                className=" text-tertiary font-medium w-fit block cursor-pointer"
               >
                 Sign up
               </a>
@@ -215,13 +215,6 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
           )}
         </div>
       </form>
-      <div className="lg:w-[385px] w-full lg:h-full h-[500px] bg-cover bg-no-repeat bg-access-pattern flex flex-col justify-center items-center gap-5">
-        <h1 className="text-white w-4/5 text-[30px] font-medium text-center">Join other volunteers in this exercise as we give to charity.</h1>
-        <h2 className="text-white w-4/5 text-md text-center font-normal">
-          ‘we can’t help everyone, but everyone can help someone’ -Ronald Reagan
-        </h2>
-        <button className="btn">Gallery</button>
-      </div>
     </div>
   );
 };

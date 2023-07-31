@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import volunteers from "./routes/volunteer";
+import users from "./routes/users";
 import errorHandler from "./middleware/errorHandler";
 import {setting} from "./config/config";
 
@@ -22,7 +22,7 @@ connectDb();
 const port = setting.port || 5000;
 
 app.use(express.json());
-app.use("/api/volunteer", volunteers);
+app.use("/api/user", users);
 app.use(errorHandler);
 
 app.listen(port, () => {

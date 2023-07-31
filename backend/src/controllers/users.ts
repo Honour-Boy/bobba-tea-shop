@@ -2,9 +2,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { setting } from '../config/config';
-import {createVolunteer, findVolunteer} from '../dal/volunteers';
-import {validate} from "../models/volunteers";
-import { volunteerInput } from '../models/volunteers';
+import {createVolunteer, findVolunteer} from '../dal/users';
+import {validate} from "../models/users";
+import { volunteerInput } from '../models/users';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     const input: volunteerInput = {

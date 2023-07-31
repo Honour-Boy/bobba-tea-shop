@@ -1,12 +1,12 @@
 import {Schema, model} from "mongoose";
 import Joi from "joi";
 
-export interface volunteerInput {
+export interface userInput {
     email: string;
     password: string;
 }
 
-const volunteer: Schema = new Schema<volunteerInput>({
+const volunteer: Schema = new Schema<userInput>({
     email: {
         type: String,
         required: true
@@ -17,11 +17,11 @@ const volunteer: Schema = new Schema<volunteerInput>({
     }
 }, {timestamps: true});
 
-interface VolunteerModel extends volunteerInput, Document {}
+interface UserModel extends userInput, Document {}
 
-export const Volunteer = model<VolunteerModel>("Volunteers", volunteer);
+export const User = model<UserModel>("Volunteers", volunteer);
 
-export function validate(volunteer: volunteerInput) {
+export function validate(volunteer: userInput) {
     const schema = Joi.object({
         email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
         password: Joi.string().pattern(new RegExp ('^(?=.*[!@#$%^&(),.?":{}|<>])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$')).required()
