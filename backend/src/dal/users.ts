@@ -1,12 +1,12 @@
 import { User } from '../models/users';
-import { userInput } from '../models/users';
+import { userInput, user } from '../models/users';
 
-export const createVolunteer = async (payload: userInput): Promise<userInput> => {
-  const user = await User.create(payload)
+export const createUser = async (payload: userInput): Promise<user> => {
+  const user = await User.create(payload);
   return user;
 };
 
-export const findVolunteer = async (email: string ): Promise<userInput|null> => {
+export const findUser = async (email: string ): Promise<userInput|null> => {
   const user = await User.findOne({email});
   return user;
 };
