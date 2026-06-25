@@ -34,7 +34,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-white-100 text-[#2b2b2b]">
-      <div className={msg.show ? "brightness-50 pointer-events-none" : ""}>
+      <div>
         <Navbar />
 
         <section className="mx-auto max-w-6xl px-5 pb-6 pt-14 text-center">

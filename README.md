@@ -80,9 +80,17 @@ VITE_API_URL=http://localhost:5000/api
 ### Shopping & accounts
 
 Browsing and ordering work **without an account** — the cart is kept in the
-browser (`localStorage`). Logging in is optional: it’s offered after checkout
-and, when used, saves the cart to the user’s account via the API. The JWT is
-stored in `localStorage` and sent on authenticated requests.
+browser (`localStorage`). Each menu item uses a quantity stepper, and once the
+cart has items the checkout panel docks to the right of the menu.
+
+Checkout opens a **demo payment step** (a placeholder card form — do not enter
+real details). The fields are validated (16-digit card number, name, a
+non-expired `MM/YY` date, and a 3–4 digit CVC) and the **Pay** button stays
+disabled until they're all valid. Paying shows an order confirmation.
+
+Logging in is optional: it’s offered after checkout and, when used, saves the
+cart to the user’s account via the API. The JWT is stored in `localStorage`
+and sent on authenticated requests.
 
 ## API
 
@@ -103,3 +111,19 @@ Passwords must be at least 8 characters and include a number and a symbol.
 
 - **Frontend:** React, Vite, Tailwind CSS, React Router, Framer Motion, Axios
 - **Backend:** Express, TypeScript, MongoDB/Mongoose, JWT, bcrypt, Joi
+
+## Development workflow
+
+Work lands through short-lived branches that flow into `main` via `staging`:
+
+1. Branch each change off `staging` as an independent `feat/*` or `fix/*`
+   (or `docs/*`) branch.
+2. Merge the completed branch into `staging` (`--no-ff`) and verify there.
+3. Once `staging` is good, merge `staging` into `main`.
+
+```
+feat/* | fix/*  ─►  staging  ─►  main
+```
+
+So `main` always reflects what has been integrated and verified on `staging`,
+and every feature/fix keeps its own history.
