@@ -100,6 +100,23 @@ export function CartProvider({ children }) {
     [persistRemote]
   );
 
+  const decrementItem = useCallback(
+    (name) => {
+      const prev = itemsRef.current;
+      const existing = prev.find((i) => i.name === name);
+      if (!existing) return;
+      const next =
+        existing.count <= 1
+          ? prev.filter((i) => i.name !== name)
+          : prev.map((i) =>
+              i.name === name ? { ...i, count: i.count - 1 } : i
+            );
+      setItems(next);
+      persistRemote(next);
+    },
+    [persistRemote]
+  );
+
   const removeItem = useCallback(
     (name) => {
       const next = itemsRef.current.filter((i) => i.name !== name);
@@ -118,7 +135,15 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ items, totalCount, addItem, removeItem, clear, syncing }}
+      value={{
+        items,
+        totalCount,
+        addItem,
+        decrementItem,
+        removeItem,
+        clear,
+        syncing,
+      }}
     >
       {children}
     </CartContext.Provider>
