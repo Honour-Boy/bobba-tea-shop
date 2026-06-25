@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Navbar, Footer } from "../components";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import {
+  createOrder,
+  makeReference,
+  LAST_ORDER_KEY,
+  PENDING_ORDER_KEY,
+} from "../api/orders";
 import { flavor1, flavor2, flavor3, flavor4 } from "../assets";
 
 const menu = [
@@ -81,11 +87,7 @@ const validatePayment = (card) => {
 };
 
 const Menu = () => {
-  const [checkout, setCheckout] = useState({
-    show: false,
-    step: "payment",
-    guest: false,
-  });
+  const [checkout, setCheckout] = useState({ show: false });
   const [card, setCard] = useState(EMPTY_CARD);
   const [touched, setTouched] = useState({});
   const { isAuthenticated } = useAuth();
@@ -109,23 +111,56 @@ const Menu = () => {
     if (!hasItems) return;
     setCard(EMPTY_CARD);
     setTouched({});
-    setCheckout({ show: true, step: "payment", guest: !isAuthenticated });
+    setCheckout({ show: true });
   };
 
-  const pay = (e) => {
+  const pay = async (e) => {
     e.preventDefault();
     if (!payValid) {
       setTouched({ number: true, name: true, expiry: true, cvc: true });
       return;
     }
+
+    const order = {
+      reference: makeReference(),
+      items: items.map((i) => ({
+        name: i.name,
+        count: i.count,
+        price: priceOf(i.name),
+      })),
+      total,
+      date: new Date().toISOString(),
+      saved: false,
+    };
+
+    if (isAuthenticated) {
+      try {
+        const saved = await createOrder({
+          items: order.items,
+          total: order.total,
+        });
+        order.saved = true;
+        order._id = saved?._id;
+        if (saved?.reference) order.reference = saved.reference;
+        if (saved?.createdAt) order.date = saved.createdAt;
+      } catch {
+        // Saving failed — still show the receipt; order stays unsaved.
+      }
+    } else {
+      // Keep it locally so the guest can save it by logging in later.
+      localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(order));
+    }
+
+    localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
     clear();
-    setCheckout((c) => ({ ...c, step: "confirmed" }));
+    setCheckout({ show: false });
+    navigate("/receipt", { state: { order } });
   };
 
   const closeCheckout = () => {
     setCard(EMPTY_CARD);
     setTouched({});
-    setCheckout({ show: false, step: "payment", guest: false });
+    setCheckout({ show: false });
   };
 
   return (
@@ -279,12 +314,11 @@ const Menu = () => {
         <Footer />
       </div>
 
-      {/* Checkout: placeholder payment layer, then order confirmation */}
+      {/* Checkout: placeholder payment layer; confirmation lives on /receipt */}
       {checkout.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white-100 p-7 shadow-2xl">
-            {checkout.step === "payment" ? (
-              <form onSubmit={pay} className="text-left">
+            <form onSubmit={pay} className="text-left">
                 <h2 className="text-center text-2xl font-bold">Payment</h2>
                 <p className="mt-3 rounded-lg bg-tertiary/10 px-4 py-2 text-center text-xs font-medium text-tertiary">
                   🔒 Demo checkout — please don’t enter any real card details.
@@ -397,45 +431,7 @@ const Menu = () => {
                 >
                   Cancel
                 </button>
-              </form>
-            ) : (
-              <div className="text-center">
-                <p className="text-4xl">🎉</p>
-                <h2 className="mt-2 text-2xl font-bold">Order confirmed!</h2>
-                <p className="mt-2 text-[#5b5b5b]">
-                  Thanks for your order — it’ll be shaken fresh.
-                </p>
-                {checkout.guest ? (
-                  <>
-                    <p className="mt-5 text-sm text-[#5b5b5b]">
-                      Want to save your order history and check out faster next
-                      time?
-                    </p>
-                    <div className="mt-4 flex gap-3">
-                      <button
-                        onClick={() => navigate("/access")}
-                        className="flex-1 rounded-lg bg-tertiary py-2.5 font-semibold text-white transition hover:opacity-90"
-                      >
-                        Log in to save order
-                      </button>
-                      <button
-                        onClick={closeCheckout}
-                        className="flex-1 rounded-lg border-2 border-tertiary py-2.5 font-semibold text-tertiary transition hover:bg-tertiary/5"
-                      >
-                        Maybe later
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <button
-                    onClick={closeCheckout}
-                    className="mt-6 w-full rounded-lg bg-tertiary py-2.5 font-semibold text-white transition hover:opacity-90"
-                  >
-                    Done
-                  </button>
-                )}
-              </div>
-            )}
+            </form>
           </div>
         </div>
       )}
