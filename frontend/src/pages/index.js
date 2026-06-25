@@ -5,6 +5,7 @@ import Donation from "./donation";
 import About from "./about";
 import Menu from "./menu";
 import Contact from "./contact";
+import Receipt from "./receipt";
 
 export {
   Access,
@@ -14,4 +15,5 @@ export {
   About,
   Menu,
   Contact,
+  Receipt,
 };
