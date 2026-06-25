@@ -90,6 +90,14 @@ const Navbar = ({ transparent = false }) => {
 
         <div className="flex items-center gap-4">
           <CartButton />
+          {isAuthenticated && (
+            <button
+              onClick={() => navigate("/orders")}
+              className={`hidden text-sm font-medium transition hover:text-tertiary sm:block ${topText}`}
+            >
+              Orders
+            </button>
+          )}
           {isAuthenticated ? (
             <button
               onClick={handleLogout}
@@ -145,6 +153,17 @@ const Navbar = ({ transparent = false }) => {
               </NavLink>
             </li>
           ))}
+          {isAuthenticated && (
+            <li>
+              <NavLink
+                to="/orders"
+                className={mobileLinkClass}
+                onClick={() => setOpen(false)}
+              >
+                Orders
+              </NavLink>
+            </li>
+          )}
           <button
             onClick={() => {
               setOpen(false);

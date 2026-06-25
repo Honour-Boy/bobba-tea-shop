@@ -88,9 +88,12 @@ real details). The fields are validated (16-digit card number, name, a
 non-expired `MM/YY` date, and a 3–4 digit CVC) and the **Pay** button stays
 disabled until they're all valid. Paying shows an order confirmation.
 
-Logging in is optional: it’s offered after checkout and, when used, saves the
-cart to the user’s account via the API. The JWT is stored in `localStorage`
-and sent on authenticated requests.
+After paying, a **receipt page** confirms the order (reference, items, total)
+with options to return home, share, and — for guests — log in to save it.
+Logging in is optional: a guest's order is stashed locally and saved to their
+account on login, after which signed-in users can review their past orders on
+the **Orders** page. The JWT is stored in `localStorage` and sent on
+authenticated requests.
 
 ## API
 
@@ -103,6 +106,8 @@ Base URL: `http://localhost:5000`
 | POST   | `/api/cart/create`   | Yes  | Create a cart for the user.     |
 | GET    | `/api/cart/user`     | Yes  | Get the current user's cart.    |
 | PUT    | `/api/cart/user`     | Yes  | Update the current user's cart. |
+| POST   | `/api/orders`        | Yes  | Place an order for the user.    |
+| GET    | `/api/orders`        | Yes  | List the user's past orders.    |
 
 Authenticated requests must include the JWT in an `auth-token` header.
 Passwords must be at least 8 characters and include a number and a symbol.
