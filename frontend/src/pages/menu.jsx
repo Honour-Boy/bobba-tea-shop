@@ -130,7 +130,7 @@ const Menu = () => {
 
   return (
     <div className="min-h-screen bg-white-100 text-[#2b2b2b]">
-      <div className={checkout.show ? "brightness-50 pointer-events-none" : ""}>
+      <div>
         <Navbar />
 
         <section className="mx-auto max-w-6xl px-5 pb-6 pt-14 text-center">
@@ -281,8 +281,8 @@ const Menu = () => {
 
       {/* Checkout: placeholder payment layer, then order confirmation */}
       {checkout.show && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-5 pointer-events-none">
-          <div className="pointer-events-auto max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white-100 p-7 shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white-100 p-7 shadow-2xl">
             {checkout.step === "payment" ? (
               <form onSubmit={pay} className="text-left">
                 <h2 className="text-center text-2xl font-bold">Payment</h2>
