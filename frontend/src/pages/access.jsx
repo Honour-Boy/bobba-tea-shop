@@ -12,11 +12,7 @@ const Access = () => {
   const [allow, setAllow] = useState(true);
   return (
     <div className="relative w-full">
-      <div
-        className={`${
-          message.show && "brightness-50 pointer-events-none"
-        } w-full h-screen bg-primary flex items-center relative z-0`}
-      >
+      <div className="w-full h-screen bg-primary flex items-center relative z-0">
         <div className="w-1/4 lg:block hidden"><video
           autoPlay={true}
           loop={true}

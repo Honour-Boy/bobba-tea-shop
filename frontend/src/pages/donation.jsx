@@ -59,7 +59,7 @@ const Donation = () => {
 
   return (
     <div className="min-h-screen bg-white-100 text-[#2b2b2b]">
-      <div className={msg.show ? "brightness-50 pointer-events-none" : ""}>
+      <div>
         <Navbar />
 
         {/* Hero */}
