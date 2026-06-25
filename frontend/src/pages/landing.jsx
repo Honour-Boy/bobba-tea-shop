@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { logo, flavor1, flavor2, flavor3, flavor4 } from "../assets";
+import { flavor1, flavor2, flavor3, flavor4 } from "../assets";
 import data from "./mainComponent/data";
 import SliderPanel from "../utils/slider";
-import { useNavigate } from "react-router-dom";
+import { Navbar } from "../components";
 
 const Landing = () => {
   const [num, setNum] = useState(1);
-  const [navNum, setNavNum] = useState(0);
-  const navigate = useNavigate();
-  const [change, setChange] = useState({
+  const [change] = useState({
     bg: ["bg-pattern-1", "bg-pattern-2", "bg-pattern-3", "bg-pattern-4"],
     rotate: [
       "-rotate-[25deg]",
@@ -17,8 +15,7 @@ const Landing = () => {
       "-rotate-[295deg]",
     ],
   });
-  const texts = ["Home", "About", "Contact"];
-  const [objects, setObjects] = useState(data);
+  const [objects] = useState(data);
   const [className, setClassName] = useState("");
 
   useEffect(() => {
@@ -69,38 +66,7 @@ const Landing = () => {
     >
       {imageDisplay}
 
-      <div className="w-full h-32 flex items-center justify-between px-5 md:justify-around md:px-0 z-10">
-        <img src={logo} className="w-24" />
-        <div className={`w-[400px] md:flex flex-col hidden`}>
-          <div className="flex justify-around">
-            <h1
-              className="txt"
-              onMouseOver={() => setNavNum(0)}
-              onClick={() => navigate("/menu")}
-            >
-              Menu
-            </h1>
-            <h1
-              className="txt"
-              onMouseOver={() => setNavNum(1)}
-              onClick={() => navigate("/about")}
-            >
-              About
-            </h1>
-            <h1
-              className="txt"
-              onMouseOver={() => setNavNum(2)}
-              onClick={() => navigate("/contact")}
-            >
-              Contact
-            </h1>
-          </div>
-          <SliderPanel activeNumber={navNum} total={3} />
-        </div>
-        <button className="btn1" onClick={() => navigate("/menu")}>
-          shop now
-        </button>
-      </div>
+      <Navbar />
 
       <div className=" w-full h-full md:pl-20 px-5 md:pt-20 py-5 flex flex-col md:justify-around justify-between z-10">
         {webInfo}
