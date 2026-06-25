@@ -12,13 +12,22 @@ const links = [
   { to: "/contact", label: "Contact" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ transparent = false }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const { totalCount } = useCart();
 
+  // On the transparent (landing) variant, the bar sits over a dark hero, so
+  // text and icons go light. The mobile dropdown stays solid and dark-on-light.
+  const topText = transparent ? "text-white" : "text-[#2b2b2b]";
+
   const linkClass = ({ isActive }) =>
+    `text-[15px] font-medium transition hover:text-tertiary ${
+      isActive ? "text-tertiary" : transparent ? "text-white" : "text-[#2b2b2b]"
+    }`;
+
+  const mobileLinkClass = ({ isActive }) =>
     `text-[15px] font-medium transition hover:text-tertiary ${
       isActive ? "text-tertiary" : "text-[#2b2b2b]"
     }`;
@@ -33,7 +42,7 @@ const Navbar = () => {
     <Link
       to="/menu"
       onClick={() => setOpen(false)}
-      className="relative flex items-center gap-1 text-[#2b2b2b] transition hover:text-tertiary"
+      className={`relative flex items-center gap-1 transition hover:text-tertiary ${topText}`}
       aria-label="Cart"
     >
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,11 +59,17 @@ const Navbar = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-white-100/90 backdrop-blur border-b border-tertiary/20">
+    <header
+      className={`sticky top-0 z-50 ${
+        transparent
+          ? "bg-transparent"
+          : "bg-white-100/90 backdrop-blur border-b border-tertiary/20"
+      }`}
+    >
       <nav className="max-w-6xl mx-auto px-5 h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} className="w-12 h-12" alt="Bobba" />
-          <span className="hidden font-bold text-lg text-[#2b2b2b] sm:block">
+          <span className={`hidden font-bold text-lg sm:block ${topText}`}>
             Bobba
           </span>
         </Link>
@@ -81,7 +96,7 @@ const Navbar = () => {
           ) : (
             <button
               onClick={() => navigate("/access")}
-              className="hidden text-sm font-medium text-[#2b2b2b] transition hover:text-tertiary sm:block"
+              className={`hidden text-sm font-medium transition hover:text-tertiary sm:block ${topText}`}
             >
               Log in
             </button>
@@ -97,21 +112,18 @@ const Navbar = () => {
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            <span
-              className={`h-[2px] w-6 bg-[#2b2b2b] transition ${
-                open ? "translate-y-[7px] rotate-45" : ""
-              }`}
-            />
-            <span
-              className={`h-[2px] w-6 bg-[#2b2b2b] transition ${
-                open ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`h-[2px] w-6 bg-[#2b2b2b] transition ${
-                open ? "-translate-y-[7px] -rotate-45" : ""
-              }`}
-            />
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className={`h-[2px] w-6 transition ${
+                  transparent ? "bg-white" : "bg-[#2b2b2b]"
+                } ${
+                  open && i === 0 ? "translate-y-[7px] rotate-45" : ""
+                } ${open && i === 1 ? "opacity-0" : ""} ${
+                  open && i === 2 ? "-translate-y-[7px] -rotate-45" : ""
+                }`}
+              />
+            ))}
           </button>
         </div>
       </nav>
@@ -122,7 +134,7 @@ const Navbar = () => {
             <li key={l.to}>
               <NavLink
                 to={l.to}
-                className={linkClass}
+                className={mobileLinkClass}
                 onClick={() => setOpen(false)}
               >
                 {l.label}

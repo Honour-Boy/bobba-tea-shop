@@ -66,7 +66,7 @@ const Landing = () => {
     >
       {imageDisplay}
 
-      <Navbar />
+      <Navbar transparent />
 
       <div className=" w-full h-full md:pl-20 px-5 md:pt-20 py-5 flex flex-col md:justify-around justify-between z-10">
         {webInfo}
