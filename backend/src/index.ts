@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import users from "./routes/users";
 import carts from "./routes/cart";
+import orders from "./routes/orders";
 import errorHandler from "./middleware/errorHandler";
 import cors from "cors";
 import {setting} from "./config/config";
@@ -39,6 +40,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/user", users);
 app.use("/api/cart", carts);
+app.use("/api/orders", orders);
 app.use(errorHandler);
 
 app.listen(port, () => {
