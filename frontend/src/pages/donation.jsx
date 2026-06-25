@@ -1,191 +1,218 @@
-import { useState, useEffect } from "react";
-import { logo } from "../assets";
+import { useState } from "react";
+import { Navbar, Footer } from "../components";
 import { Alert } from "./mainComponent";
 
+const causes = [
+  {
+    title: "Community Cups",
+    body: "Free boba and warm meals for students and families in need across our neighbourhoods.",
+  },
+  {
+    title: "Greener Sips",
+    body: "Funding compostable cups, paper straws and zero-waste kitchens in every store.",
+  },
+  {
+    title: "Local Farmers",
+    body: "Fair pricing and support for the small farms that grow our fruit and tea leaves.",
+  },
+];
+
+const amounts = ["$10", "$25", "$50"];
+
 const Donation = () => {
-  const [msg, setMsg] = useState({
-    value: "",
-    show: false,
-  });
+  const [msg, setMsg] = useState({ value: "", show: false });
   const [showCustom, setShowCustom] = useState(false);
-  const [type, setType] = useState("");
-  const [amount, setAmount] = useState("$");
+  const [cause, setCause] = useState("");
+  const [amount, setAmount] = useState("");
+  const [customAmount, setCustomAmount] = useState("$");
   const [isValidInput, setIsValidInput] = useState(true);
   const [frequency, setFrequency] = useState("");
 
-  function Change(event) {
-    const { name, value, type } = event.target;
-
-    // Check if the input contains only numbers or "$"
+  const handleCustom = (e) => {
+    const { value } = e.target;
     const regex = /^\$[0-9]+(\.[0-9][0-9])?$/;
-    if (type === "text") {
-      const isValid = regex.test(value);
-      setIsValidInput(isValid);
-    }
+    setIsValidInput(regex.test(value));
+    setCustomAmount(value);
+    setAmount(value);
+  };
 
-    // Update the state based on the input name
-    if (name === "donation") {
-      setAmount(value);
-    } else if (name === "frequency") {
-      setFrequency(value);
-    } else if (name === "type") {
-      setType(value);
-    }
-  }
-
-  function setMessage(value) {
-    setMsg((prevMsg) => {
-      return {
-        ...prevMsg,
-        value: value,
-        show: true,
-      };
-    });
-  }
-
-  useEffect(() => {
-    if (!msg.show) {
-      Cancel();
-    }
-  }, [msg.show]);
-
-  function Cancel() {
+  const reset = () => {
+    setCause("");
     setAmount("");
+    setCustomAmount("$");
     setFrequency("");
-    setType("");
-  }
+    setShowCustom(false);
+  };
 
-  console.log(type);
+  const checkout = (e) => {
+    e.preventDefault();
+    if (!cause || !amount || !frequency) {
+      setMsg({ value: "Please choose a cause, an amount and a frequency.", show: true });
+      return;
+    }
+    setMsg({
+      value: `Thank you! Your ${frequency.toLowerCase()} gift of ${amount} supports ${cause}.`,
+      show: true,
+    });
+    reset();
+  };
+
   return (
-    <div className="relative z-0">
-      <div
-        className={`bg-donation-pattern bg-no-repeat w-full min-h-screen h-full bg-cover flex items-center justify-center p-5 ${
-          msg.show && "brightness-50 pointer-events-none"
-        }`}
-      >
-        <div className="lg:w-3/5 w-full sm:h-[550px] rounded-xl bg-white p-3 flex sm:flex-row flex-col sm:gap-5 overflow-scroll">
-          <div className="bg-donation-2-pattern bg-cover bg-no-repeat sm:w-1/2 w-full sm:h-full h-[500px] rounded-xl flex items-center justify-center">
-            <h1 className="text-[45px] text-white font-semibold w-[180px] text-center">
-              We Can Save The Future
+    <div className="min-h-screen bg-white-100 text-[#2b2b2b]">
+      <div className={msg.show ? "brightness-50 pointer-events-none" : ""}>
+        <Navbar />
+
+        {/* Hero */}
+        <section className="bg-gradient-to-br from-tertiary to-[#a9632b] text-white">
+          <div className="mx-auto max-w-6xl px-5 py-20 text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
+              Boba for a Cause
+            </p>
+            <h1 className="mx-auto mt-3 max-w-2xl text-4xl font-extrabold leading-tight sm:text-5xl">
+              Every cup can do a little good.
             </h1>
+            <p className="mx-auto mt-5 max-w-xl text-white/90">
+              A share of every Bobba you buy goes back into the community. Add a
+              donation and help us pour a little kindness into the world.
+            </p>
           </div>
-          <div className="sm:w-1/2 w-full sm:h-full h-[550px] rounded-xl p-2">
-            <img src={logo} className="w-36" />
-            <p className="text-[#828282] text-sm mt-4">
-              Welcome to GlobalKidsCare donation, please fill out the form
-              below. Thank you.
+        </section>
+
+        {/* Causes */}
+        <section className="mx-auto max-w-6xl px-5 py-16">
+          <h2 className="text-center text-3xl font-bold">Where your gift goes</h2>
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            {causes.map((c) => (
+              <div
+                key={c.title}
+                className="rounded-2xl border border-tertiary/20 bg-white p-7 shadow-sm"
+              >
+                <h3 className="text-xl font-semibold text-tertiary">{c.title}</h3>
+                <p className="mt-3 text-sm text-[#5b5b5b]">{c.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Donation form */}
+        <section className="mx-auto max-w-3xl px-5 pb-20">
+          <form className="rounded-3xl border border-tertiary/15 bg-white p-8 shadow-sm">
+            <h2 className="text-2xl font-bold">Make a donation</h2>
+            <p className="mt-2 text-sm text-[#828282]">
+              Fill out the form below — it only takes a minute. Thank you!
             </p>
 
-            <label className="block mt-4 mb-2">Choose a destination type</label>
+            <label className="mb-2 mt-6 block font-medium">Choose a cause</label>
             <select
-              className="bg-[#f4f4f4] p-1 text-[#828282] w-full outline-none"
-              name="type"
-              value={type}
-              onChange={Change}
+              className="w-full rounded-lg border border-tertiary/40 bg-white-100 p-3 outline-none"
+              value={cause}
+              onChange={(e) => setCause(e.target.value)}
             >
-              <option value="">select type</option>
-              <option value="Cost of Education">Cost of Education</option>
-              <option value="Health Cost">Health Cost</option>
-              <option value="Cost of Provision">Cost of Provision</option>
+              <option value="">Select a cause</option>
+              {causes.map((c) => (
+                <option key={c.title} value={c.title}>
+                  {c.title}
+                </option>
+              ))}
             </select>
 
-            <label className="mt-5 block mb-2">Choose a Donation Amount</label>
-            <div className="flex items-center gap-1 mt-3">
-              <input
-                type="radio"
-                name="donation"
-                value="$20"
-                onChange={Change}
-                checked={amount === "$20"}
-              />
-              <label>$20</label>
-            </div>
-            <div className="flex items-center gap-1 mt-3">
-              <input
-                type="radio"
-                name="donation"
-                value="$50"
-                onChange={Change}
-                checked={amount === "$50"}
-              />
-              <label>$50</label>
-            </div>
-            <div className="flex items-center gap-1 mt-3">
-              <input
-                type="radio"
-                name="donation"
-                value="$100"
-                onChange={Change}
-                checked={amount === "$100"}
-              />
-              <label>$100</label>
-            </div>
-            <a
-              className="text-xs underline text-[#27AE60] mt-3 block cursor-pointer"
-              onClick={() => setShowCustom(!showCustom)}
-            >
-              {showCustom
-                ? "Remove the custom donation amount?"
-                : "Enter a custom donation amount?"}
-            </a>
-            <input
-              type="text"
-              name="donation"
-              placeholder="$0.00"
-              onChange={Change}
-              value={amount}
-              className={`h-[40px] w-50 border-2 ${isValidInput ? "border-[#27ae60] text-[#27ae60]" :"border-red-100 text-red-100"}  rounded-lg p-2 outline-none ${
-                showCustom ? "block" : "hidden"
-              }`}
-            />
-
-            <label className="mt-5 block mb-2">
-              Choose a Donation Frequency
-            </label>
-            <div className="flex gap-2">
-              <div className="flex items-center gap-1 w-[180px] bg-[#D6F7E4] h-[30px] p-2 rounded-md">
-                <input
-                  type="radio"
-                  name="frequency"
-                  value="Monthly"
-                  onChange={Change}
-                  checked={frequency === "Monthly"}
-                />
-                <label>Monthly</label>
-              </div>
-              <div className="flex items-center gap-1 w-[180px] bg-[#f4f4f4] h-[30px] p-2 text-[#828282] rounded-md">
-                <input
-                  type="radio"
-                  name="frequency"
-                  value="One time"
-                  onChange={Change}
-                  checked={frequency === "One time"}
-                />
-                <label>One time</label>
-              </div>
-            </div>
-            <label className="text-[#828282] text-xs block mt-2">
-              {frequency === ""
-                ? ""
-                : frequency === "Monthly"
-                ? "This will deduct the stated donation amount above from your account every month"
-                : "This will only deduct the stated donation amount above once."}
-            </label>
-            <div className="flex w-full mt-6 items-center gap-2">
+            <label className="mb-3 mt-6 block font-medium">Choose an amount</label>
+            <div className="flex flex-wrap gap-3">
+              {amounts.map((a) => (
+                <button
+                  type="button"
+                  key={a}
+                  onClick={() => {
+                    setAmount(a);
+                    setShowCustom(false);
+                    setIsValidInput(true);
+                  }}
+                  className={`rounded-full border-2 px-6 py-2 font-semibold transition ${
+                    amount === a && !showCustom
+                      ? "border-tertiary bg-tertiary text-white"
+                      : "border-tertiary/40 text-tertiary hover:border-tertiary"
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
               <button
-                className="w-[180px] h-[35px] border-[#27ae60] text-[#27ae60] border-2 rounded-md"
-                onClick={() => setMessage("Warning!!!.You will be redirected")}
-                disabled={!isValidInput}
+                type="button"
+                onClick={() => {
+                  setShowCustom(true);
+                  setAmount(customAmount);
+                }}
+                className={`rounded-full border-2 px-6 py-2 font-semibold transition ${
+                  showCustom
+                    ? "border-tertiary bg-tertiary text-white"
+                    : "border-tertiary/40 text-tertiary hover:border-tertiary"
+                }`}
               >
-                Cancel
-              </button>
-              <button className="w-[180px] h-[35px] bg-[#27ae60] text-white rounded-md">
-                Checkout
+                Custom
               </button>
             </div>
-          </div>
-        </div>
+            {showCustom && (
+              <input
+                type="text"
+                placeholder="$0.00"
+                onChange={handleCustom}
+                value={customAmount}
+                className={`mt-4 h-[44px] w-40 rounded-lg border-2 p-3 outline-none ${
+                  isValidInput
+                    ? "border-tertiary text-tertiary"
+                    : "border-red-100 text-red-100"
+                }`}
+              />
+            )}
+
+            <label className="mb-3 mt-6 block font-medium">Frequency</label>
+            <div className="flex flex-wrap gap-3">
+              {["Monthly", "One time"].map((f) => (
+                <button
+                  type="button"
+                  key={f}
+                  onClick={() => setFrequency(f)}
+                  className={`rounded-lg border px-5 py-2 transition ${
+                    frequency === f
+                      ? "border-tertiary bg-tertiary/10 text-tertiary"
+                      : "border-tertiary/30 text-[#5b5b5b] hover:border-tertiary"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 min-h-[18px] text-xs text-[#828282]">
+              {frequency === "Monthly"
+                ? "This will deduct the amount above from your account every month."
+                : frequency === "One time"
+                ? "This will deduct the amount above once."
+                : ""}
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={reset}
+                className="flex-1 rounded-lg border-2 border-tertiary py-3 font-semibold text-tertiary transition hover:bg-tertiary/5"
+              >
+                Reset
+              </button>
+              <button
+                type="submit"
+                onClick={checkout}
+                disabled={!isValidInput}
+                className="flex-1 rounded-lg bg-tertiary py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+              >
+                Donate now
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <Footer />
       </div>
+
       <Alert msg={msg} setMsg={setMsg} />
     </div>
   );

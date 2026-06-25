@@ -73,13 +73,25 @@ const Landing = () => {
         <img src={logo} className="w-24" />
         <div className={`w-[400px] md:flex flex-col hidden`}>
           <div className="flex justify-around">
-            <h1 className="txt" onMouseOver={() => setNavNum(0)}>
-              Home
+            <h1
+              className="txt"
+              onMouseOver={() => setNavNum(0)}
+              onClick={() => navigate("/menu")}
+            >
+              Menu
             </h1>
-            <h1 className="txt" onMouseOver={() => setNavNum(1)}>
+            <h1
+              className="txt"
+              onMouseOver={() => setNavNum(1)}
+              onClick={() => navigate("/about")}
+            >
               About
             </h1>
-            <h1 className="txt" onMouseOver={() => setNavNum(2)}>
+            <h1
+              className="txt"
+              onMouseOver={() => setNavNum(2)}
+              onClick={() => navigate("/contact")}
+            >
               Contact
             </h1>
           </div>
