@@ -70,6 +70,20 @@ Frontend scripts:
 | `npm run preview` | Preview the production build.        |
 | `npm run lint`    | Run ESLint.                          |
 
+The frontend talks to the backend API at `http://localhost:5000/api` by
+default. To point it elsewhere, set `VITE_API_URL` in a `frontend/.env` file:
+
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Shopping & accounts
+
+Browsing and ordering work **without an account** — the cart is kept in the
+browser (`localStorage`). Logging in is optional: it’s offered after checkout
+and, when used, saves the cart to the user’s account via the API. The JWT is
+stored in `localStorage` and sent on authenticated requests.
+
 ## API
 
 Base URL: `http://localhost:5000`
@@ -82,7 +96,8 @@ Base URL: `http://localhost:5000`
 | GET    | `/api/cart/user`     | Yes  | Get the current user's cart.    |
 | PUT    | `/api/cart/user`     | Yes  | Update the current user's cart. |
 
-Authenticated requests must include the token in an `Authorization` header.
+Authenticated requests must include the JWT in an `auth-token` header.
+Passwords must be at least 8 characters and include a number and a symbol.
 
 ## Tech stack
 

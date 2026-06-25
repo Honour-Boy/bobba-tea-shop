@@ -97,7 +97,7 @@ const Landing = () => {
           </div>
           <SliderPanel activeNumber={navNum} total={3} />
         </div>
-        <button className="btn1" onClick={() => navigate("/access")}>
+        <button className="btn1" onClick={() => navigate("/menu")}>
           shop now
         </button>
       </div>

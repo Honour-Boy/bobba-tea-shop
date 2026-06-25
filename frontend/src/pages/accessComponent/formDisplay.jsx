@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { FormApi } from "./formApi";
+import { useState } from "react";
 import { styles } from "../../styles";
 import { useNavigate } from "react-router-dom";
 import { logo, google } from "../../assets";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../../context/AuthContext";
+import { apiError } from "../../api/client";
 import axios from "axios";
 
-
 const Form = ({ setMsg, msg, allow, setAllow }) => {
-  const [formCheck, setFormCheck] = useState([]);
   const navigate = useNavigate();
-  const [allowSubmit, setAllowSubmit] = useState(false);
-  const [pageName, setPageName] = useState("");
+  const { login, register } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     Name: "",
@@ -20,110 +19,67 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
   });
 
   function Change(event) {
-    setFormData((prevFormData) => {
-      const { name, value } = event.target;
-      return {
-        ...prevFormData,
-        [name]: value,
-      };
-    });
-  }
-
-  useEffect(() => {
-    async function fetchLoginData() {
-      const result = await FormApi.read();
-      setFormCheck(result);
-    }
-
-    fetchLoginData();
-  }, [2]);
-
-  useEffect(() => {
-    async function submitData() {
-      await FormApi.create(formData);
-      const result = FormApi.Array[0];
-      if (result === 200) {
-        setMessage("Sign up completed successfully");
-        setAllow(false);
-        clearFields();
-      } else {
-        setMessage(/*"Sorry couldn't sign up."*/ result);
-      }
-      clearFields();
-      FormApi.Array.pop();
-    }
-    if (allowSubmit) {
-      submitData();
-    }
-  }, [allowSubmit]);
-
-  function loginSubmit(event) {
-    event.preventDefault();
-    for (let i = 0; i < formCheck.length; i++) {
-      if (
-        formData.Email === formCheck[i].Email &&
-        formData.Password === formCheck[i].Password
-      ) {
-        setMessage("Login Successful");
-        setPageName("/Home");
-        break;
-      } else {
-        setMessage("Login Failed, Try Again.");
-      }
-    }
-    clearFields();
-  }
-
-  function signupSubmit(event) {
-    event.preventDefault();
-    if (
-      formData.Email !== "" &&
-      formData.Name !== "" &&
-      formData.Password !== ""
-    ) {
-      setAllowSubmit(true);
-    } else {
-      setMessage("Please fill all the fields.");
-    }
-  }
-
-  function clearFields() {
-    setFormData((prevData) => {
-      return {
-        ...prevData,
-        Name: "",
-        Email: "",
-        Password: "",
-      };
-    });
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   function setMessage(value) {
-    setMsg((prevMsg) => {
-      return {
-        ...prevMsg,
-        value: value,
-        show: true,
-      };
-    });
+    setMsg((prev) => ({ ...prev, value, show: true }));
   }
 
-  useEffect(() => {
-    if (!msg.show) {
-      navigate(pageName, { replace: true });
-    }
-  }, [msg.show]);
+  function clearFields() {
+    setFormData((prev) => ({ ...prev, Name: "", Email: "", Password: "" }));
+  }
 
-  const login = useGoogleLogin({
-    onSuccess: async response => {
-      const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: {
-          "Authorization": `Bearer ${response.access_token}`
-        }
-      })
-      console.log(res.data)
+  async function loginSubmit(event) {
+    event.preventDefault();
+    if (!formData.Email || !formData.Password) {
+      setMessage("Please enter your email and password.");
+      return;
     }
-  })
+    setLoading(true);
+    try {
+      await login(formData.Email, formData.Password);
+      clearFields();
+      navigate("/menu");
+    } catch (err) {
+      setMessage(apiError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function signupSubmit(event) {
+    event.preventDefault();
+    if (!formData.Name || !formData.Email || !formData.Password) {
+      setMessage("Please fill all the fields.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await register(formData.Email, formData.Password);
+      clearFields();
+      navigate("/menu");
+    } catch (err) {
+      setMessage(apiError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const login_google = useGoogleLogin({
+    onSuccess: async (response) => {
+      const res = await axios.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${response.access_token}`,
+          },
+        }
+      );
+      console.log(res.data);
+    },
+  });
 
   const headings = allow ? (
     <div className="mt-20">
@@ -147,7 +103,11 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
         <img src={logo} className="h-fit inset-0 absolute m-5 w-[80px]" />
         {headings}
         <div className="mt-5 flex flex-col gap-5">
-          <button className="border-2 border-tertiary text-tertiary rounded-2xl p-5 flex items-center justify-center gap-1 w-full" onClick={() => login()} >
+          <button
+            type="button"
+            className="border-2 border-tertiary text-tertiary rounded-2xl p-5 flex items-center justify-center gap-1 w-full"
+            onClick={() => login_google()}
+          >
             <img src={google} className="w-6" />
             Log In with Google
           </button>
@@ -173,7 +133,7 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
           />
           <label>Email</label>
           <input
-            type="text"
+            type="email"
             placeholder="Enter Email"
             onChange={Change}
             className="input-text block w-full xs:w-3/4"
@@ -189,8 +149,17 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
             name="Password"
             value={formData.Password}
           />
-          <button className="btn" onClick={allow ? signupSubmit : loginSubmit}>
-            {allow ? "Sign up" : "Login"}
+          {allow && (
+            <p className="-mt-3 mb-2 text-xs text-[#828282]">
+              At least 8 characters, including a number and a symbol.
+            </p>
+          )}
+          <button
+            className="btn disabled:opacity-50"
+            onClick={allow ? signupSubmit : loginSubmit}
+            disabled={loading}
+          >
+            {loading ? "Please wait..." : allow ? "Sign up" : "Login"}
           </button>
           {allow ? (
             <div className="flex my-[20px] gap-1">
