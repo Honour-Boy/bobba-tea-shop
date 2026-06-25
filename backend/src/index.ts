@@ -1,3 +1,4 @@
+import "./shims/slowBuffer";
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -12,7 +13,18 @@ const app = express();
 
 const connectDb = async (): Promise<void> => {
     try {
-        const connect = await mongoose.connect(setting.connectionString);
+        let connectionString = setting.connectionString;
+
+        // No connection string configured: fall back to an in-memory MongoDB
+        // so the server can run locally without an external database.
+        if (!connectionString) {
+            const { MongoMemoryServer } = await import("mongodb-memory-server");
+            const mongod = await MongoMemoryServer.create();
+            connectionString = mongod.getUri();
+            console.log("No CONNECTIONSTRING set, using in-memory MongoDB at", connectionString);
+        }
+
+        const connect = await mongoose.connect(connectionString);
         console.log("Connected to", connect.connection.name);
     } catch (err) {
         console.log(err);

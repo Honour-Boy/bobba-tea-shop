@@ -142,7 +142,7 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
   );
 
   return (
-    <div className="flex w-3/4 h-full bg-white-100 lg:flex-row flex-col overflow-auto">
+    <div className="flex w-full lg:w-3/4 h-full bg-white-100 lg:flex-row flex-col overflow-auto">
       <form className={`md:w-[550px] w-full lg:mx-[10%] md:mx-0 ${styles.padding} relative`}>
         <img src={logo} className="h-fit inset-0 absolute m-5 w-[80px]" />
         {headings}

@@ -69,7 +69,7 @@ const Landing = () => {
     >
       {imageDisplay}
 
-      <div className="w-full h-32 flex items-center justify-around z-10">
+      <div className="w-full h-32 flex items-center justify-between px-5 md:justify-around md:px-0 z-10">
         <img src={logo} className="w-24" />
         <div className={`w-[400px] md:flex flex-col hidden`}>
           <div className="flex justify-around">
@@ -92,7 +92,7 @@ const Landing = () => {
 
       <div className=" w-full h-full md:pl-20 px-5 md:pt-20 py-5 flex flex-col md:justify-around justify-between z-10">
         {webInfo}
-        <div className="w-[500px] flex flex-col gap-2 overflow-auto">
+        <div className="w-full max-w-[500px] flex flex-col gap-2 overflow-auto">
           <div className="flex items-center justify-around">
             <img
               src={flavor1}
@@ -120,7 +120,7 @@ const Landing = () => {
       </div>
 
       <div
-        className={`w-[600px] h-[600px] absolute top-[85.5%] left-[80.5%] transition ease-in-out duration-[0.5s] ${
+        className={`w-[600px] h-[600px] absolute scale-[0.55] origin-bottom-left top-[88%] left-[60%] md:scale-100 md:origin-center md:top-[85.5%] md:left-[80.5%] transition ease-in-out duration-[0.5s] ${
           change.rotate[num - 1]
         }`}
       >

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "mongodb-memory-server": "^11.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
