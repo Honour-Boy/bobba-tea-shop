@@ -68,7 +68,11 @@ const Navbar = ({ transparent = false }) => {
     >
       <nav className="max-w-6xl mx-auto px-5 h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} className="w-12 h-12" alt="Bobba" />
+          <img
+            src={logo}
+            className={transparent ? "w-20 h-20" : "w-12 h-12"}
+            alt="Bobba"
+          />
           <span className={`hidden font-bold text-lg sm:block ${topText}`}>
             Bobba
           </span>
