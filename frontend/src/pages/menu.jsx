@@ -42,12 +42,52 @@ const menu = [
 
 const priceOf = (name) => menu.find((m) => m.name === name)?.price ?? 0;
 
+const EMPTY_CARD = { number: "", name: "", expiry: "", cvc: "" };
+const onlyDigits = (v) => v.replace(/\D/g, "");
+const formatCardNumber = (v) =>
+  onlyDigits(v)
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, "$1 ");
+const formatExpiry = (v) => {
+  const d = onlyDigits(v).slice(0, 4);
+  return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+};
+
+const validatePayment = (card) => {
+  const errors = {};
+  if (onlyDigits(card.number).length !== 16) {
+    errors.number = "Enter a valid 16-digit card number.";
+  }
+  if (!card.name.trim()) {
+    errors.name = "Enter the name on the card.";
+  }
+  const m = card.expiry.match(/^(\d{2})\/(\d{2})$/);
+  if (!m) {
+    errors.expiry = "Use MM/YY format.";
+  } else {
+    const mm = Number(m[1]);
+    const yy = Number(m[2]);
+    const now = new Date();
+    const curYY = now.getFullYear() % 100;
+    const curMM = now.getMonth() + 1;
+    if (mm < 1 || mm > 12) errors.expiry = "Invalid month.";
+    else if (yy < curYY || (yy === curYY && mm < curMM))
+      errors.expiry = "Card has expired.";
+  }
+  if (!/^\d{3,4}$/.test(card.cvc)) {
+    errors.cvc = "Enter a 3 or 4 digit CVC.";
+  }
+  return errors;
+};
+
 const Menu = () => {
   const [checkout, setCheckout] = useState({
     show: false,
     step: "payment",
     guest: false,
   });
+  const [card, setCard] = useState(EMPTY_CARD);
+  const [touched, setTouched] = useState({});
   const { isAuthenticated } = useAuth();
   const { items, addItem, decrementItem, removeItem, totalCount, clear } =
     useCart();
@@ -57,19 +97,36 @@ const Menu = () => {
   const countOf = (name) => items.find((i) => i.name === name)?.count ?? 0;
   const total = items.reduce((sum, i) => sum + priceOf(i.name) * i.count, 0);
 
+  const payErrors = validatePayment(card);
+  const payValid = Object.keys(payErrors).length === 0;
+
+  const updateCard = (field, value) =>
+    setCard((c) => ({ ...c, [field]: value }));
+  const blurField = (field) =>
+    setTouched((t) => ({ ...t, [field]: true }));
+
   const startCheckout = () => {
     if (!hasItems) return;
+    setCard(EMPTY_CARD);
+    setTouched({});
     setCheckout({ show: true, step: "payment", guest: !isAuthenticated });
   };
 
   const pay = (e) => {
     e.preventDefault();
+    if (!payValid) {
+      setTouched({ number: true, name: true, expiry: true, cvc: true });
+      return;
+    }
     clear();
     setCheckout((c) => ({ ...c, step: "confirmed" }));
   };
 
-  const closeCheckout = () =>
+  const closeCheckout = () => {
+    setCard(EMPTY_CARD);
+    setTouched({});
     setCheckout({ show: false, step: "payment", guest: false });
+  };
 
   return (
     <div className="min-h-screen bg-white-100 text-[#2b2b2b]">
@@ -242,39 +299,94 @@ const Menu = () => {
 
                 <label className="mt-4 block">Card number</label>
                 <input
-                  className="input-text block w-full"
+                  className="input-text mb-1 block w-full"
                   placeholder="1234 5678 9012 3456"
                   inputMode="numeric"
                   autoComplete="off"
+                  value={card.number}
+                  onChange={(e) =>
+                    updateCard("number", formatCardNumber(e.target.value))
+                  }
+                  onBlur={() => blurField("number")}
+                  style={
+                    touched.number && payErrors.number
+                      ? { borderColor: "#ef4444" }
+                      : undefined
+                  }
                 />
+                {touched.number && payErrors.number && (
+                  <p className="mb-3 text-xs text-red-500">{payErrors.number}</p>
+                )}
+
                 <label className="block">Name on card</label>
                 <input
-                  className="input-text block w-full"
+                  className="input-text mb-1 block w-full"
                   placeholder="Jane Doe"
                   autoComplete="off"
+                  value={card.name}
+                  onChange={(e) => updateCard("name", e.target.value)}
+                  onBlur={() => blurField("name")}
+                  style={
+                    touched.name && payErrors.name
+                      ? { borderColor: "#ef4444" }
+                      : undefined
+                  }
                 />
+                {touched.name && payErrors.name && (
+                  <p className="mb-3 text-xs text-red-500">{payErrors.name}</p>
+                )}
+
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <label className="block">Expiry</label>
                     <input
-                      className="input-text block w-full"
+                      className="input-text mb-1 block w-full"
                       placeholder="MM/YY"
+                      inputMode="numeric"
                       autoComplete="off"
+                      value={card.expiry}
+                      onChange={(e) =>
+                        updateCard("expiry", formatExpiry(e.target.value))
+                      }
+                      onBlur={() => blurField("expiry")}
+                      style={
+                        touched.expiry && payErrors.expiry
+                          ? { borderColor: "#ef4444" }
+                          : undefined
+                      }
                     />
+                    {touched.expiry && payErrors.expiry && (
+                      <p className="text-xs text-red-500">{payErrors.expiry}</p>
+                    )}
                   </div>
                   <div className="flex-1">
                     <label className="block">CVC</label>
                     <input
-                      className="input-text block w-full"
+                      className="input-text mb-1 block w-full"
                       placeholder="123"
+                      inputMode="numeric"
                       autoComplete="off"
+                      value={card.cvc}
+                      onChange={(e) =>
+                        updateCard("cvc", onlyDigits(e.target.value).slice(0, 4))
+                      }
+                      onBlur={() => blurField("cvc")}
+                      style={
+                        touched.cvc && payErrors.cvc
+                          ? { borderColor: "#ef4444" }
+                          : undefined
+                      }
                     />
+                    {touched.cvc && payErrors.cvc && (
+                      <p className="text-xs text-red-500">{payErrors.cvc}</p>
+                    )}
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="mt-2 w-full rounded-lg bg-tertiary py-3 font-semibold text-white transition hover:opacity-90"
+                  disabled={!payValid}
+                  className="mt-4 w-full rounded-lg bg-tertiary py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Pay ${total.toFixed(2)}
                 </button>
