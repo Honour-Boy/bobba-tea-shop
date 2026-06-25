@@ -6,6 +6,7 @@ import About from "./about";
 import Menu from "./menu";
 import Contact from "./contact";
 import Receipt from "./receipt";
+import Orders from "./orders";
 
 export {
   Access,
@@ -16,4 +17,5 @@ export {
   Menu,
   Contact,
   Receipt,
+  Orders,
 };
