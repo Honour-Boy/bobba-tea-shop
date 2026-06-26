@@ -1,6 +1,6 @@
 # Bobba Tea Shop
 
-A full-stack boba tea shop web app — a React + Vite frontend and an Express + TypeScript + MongoDB API.
+A full-stack boba tea shop web app — a React + Vite frontend and an Express + TypeScript + Supabase (Postgres) API.
 
 **🔗 Live demo:** https://bobba-shop.netlify.app
 
@@ -37,15 +37,18 @@ npm run start:dev      # starts the API on http://localhost:5000
 
 Environment variables (`backend/.env`):
 
-| Variable            | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `CONNECTIONSTRING`  | MongoDB URI. **Leave empty** to spin up an automatic in-memory MongoDB.     |
-| `PORT`              | Port the API listens on (defaults to `5000`).                               |
-| `ACCESSTOKENSECRET` | Secret used to sign JWT access tokens. Use a long random string.            |
+| Variable                    | Description                                                                       |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| `SUPABASE_URL`              | Your Supabase project URL (e.g. `https://xxxx.supabase.co`).                      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service-role** key. Server-side only — never expose it to the client. |
+| `PORT`                      | Port the API listens on (defaults to `5000`).                                     |
+| `ACCESSTOKENSECRET`         | Secret used to sign JWT access tokens. Use a long random string.                  |
 
-> **No database?** Leave `CONNECTIONSTRING` empty and the server boots an in-memory
-> MongoDB automatically (downloads a Mongo binary on first run; data is ephemeral).
-> To persist data, set `CONNECTIONSTRING` to a real MongoDB URI (e.g. MongoDB Atlas).
+> **Database:** The API persists data in Supabase (Postgres). Create a project at
+> [supabase.com](https://supabase.com), run the schema in [`backend/schema.sql`](backend/schema.sql)
+> from the SQL Editor, then set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
+> (Project Settings → API). The server uses the service-role key, so it talks to
+> the database directly and bypasses Row Level Security.
 
 Backend scripts:
 
@@ -117,7 +120,7 @@ Passwords must be at least 8 characters and include a number and a symbol.
 ## Tech stack
 
 - **Frontend:** React, Vite, Tailwind CSS, React Router, Framer Motion, Axios
-- **Backend:** Express, TypeScript, MongoDB/Mongoose, JWT, bcrypt, Joi
+- **Backend:** Express, TypeScript, Supabase (Postgres), JWT, bcrypt, Joi
 
 ## Development workflow
 

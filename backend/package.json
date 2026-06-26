@@ -12,10 +12,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "mongodb-memory-server": "^11.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
@@ -27,8 +27,6 @@
     "express": "^4.18.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
-    "mongodb": "^5.7.0",
-    "mongoose": "^7.3.4",
     "ts-node-dev": "^2.0.0"
   }
 }

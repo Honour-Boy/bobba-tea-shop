@@ -1,32 +1,16 @@
-import {Schema, model} from "mongoose";
 import Joi from "joi";
 
 export interface userInput {
-    _id?: Schema.Types.ObjectId;
+    _id?: string;
     email: string;
     password: string;
 }
 
 export interface user {
-    _id: Schema.Types.ObjectId;
+    _id: string;
     email: string;
     password: string;
 }
-
-const user: Schema = new Schema<userInput>({
-    email: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    }
-}, {timestamps: true});
-
-interface UserModel extends userInput, Document {}
-
-export const User = model<UserModel>("Users", user);
 
 export function validate(user: userInput) {
     const schema = Joi.object({
