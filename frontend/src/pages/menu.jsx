@@ -143,8 +143,9 @@ const Menu = () => {
         order._id = saved?._id;
         if (saved?.reference) order.reference = saved.reference;
         if (saved?.createdAt) order.date = saved.createdAt;
-      } catch {
+      } catch (err) {
         // Saving failed — still show the receipt; order stays unsaved.
+        console.error("Failed to save order:", err?.message || err);
       }
     } else {
       // Keep it locally so the guest can save it by logging in later.

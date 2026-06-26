@@ -1,6 +1,8 @@
 # Bobba Tea Shop
 
-A full-stack boba tea shop web app — a React + Vite frontend and an Express + TypeScript + Supabase (Postgres) API.
+A boba tea shop web app — a React + Vite frontend backed by **Supabase**
+(Postgres + Auth). There's no custom server: the frontend talks to Supabase
+directly, with access controlled by Row Level Security.
 
 **🔗 Live demo:** https://bobba-shop.netlify.app
 
@@ -8,79 +10,71 @@ A full-stack boba tea shop web app — a React + Vite frontend and an Express + 
 
 ```
 bobba_shop/
-├── backend/    # Express + TypeScript REST API (auth + cart)
-└── frontend/   # React + Vite + Tailwind CSS client
+├── frontend/         # React + Vite + Tailwind CSS client
+└── supabase/
+    └── schema.sql    # Database tables + RLS policies
 ```
 
 ## Prerequisites
 
 - Node.js 18+ (tested on Node 26)
 - npm
+- A free [Supabase](https://supabase.com) project
+
+## Supabase setup
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. **Database:** open **SQL Editor → New query**, paste the contents of
+   [`supabase/schema.sql`](supabase/schema.sql), and **Run**. This creates the
+   `orders` and `carts` tables with RLS policies so each user can only access
+   their own rows.
+3. **Auth providers:** under **Authentication → Providers**, enable
+   **Email** and **Google** (for Google, add your Google OAuth client ID/secret
+   and copy Supabase's callback URL into the Google Cloud Console OAuth client's
+   *Authorized redirect URIs*).
+4. **Auth URLs:** under **Authentication → URL Configuration**, set the
+   **Site URL** and add your deploy + local origins to **Redirect URLs**
+   (e.g. `https://bobba-shop.netlify.app/**` and `http://localhost:5173/**`).
+5. **API keys:** from **Project Settings → API**, grab the **Project URL** and
+   **anon/publishable key** for the frontend env (below).
 
 ## Getting started
 
-Clone the repository and install dependencies for each app.
-
 ```bash
 git clone https://github.com/Honour-Boy/bobba-tea-shop.git
-cd bobba-tea-shop
-```
-
-### Backend
-
-```bash
-cd backend
+cd bobba-tea-shop/frontend
 npm install
-cp .env.example .env   # then edit .env (see below)
-npm run start:dev      # starts the API on http://localhost:5000
-```
-
-Environment variables (`backend/.env`):
-
-| Variable                    | Description                                                                       |
-| --------------------------- | -------------------------------------------------------------------------------- |
-| `SUPABASE_URL`              | Your Supabase project URL (e.g. `https://xxxx.supabase.co`).                      |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service-role** key. Server-side only — never expose it to the client. |
-| `PORT`                      | Port the API listens on (defaults to `5000`).                                     |
-| `ACCESSTOKENSECRET`         | Secret used to sign JWT access tokens. Use a long random string.                  |
-
-> **Database:** The API persists data in Supabase (Postgres). Create a project at
-> [supabase.com](https://supabase.com), run the schema in [`backend/schema.sql`](backend/schema.sql)
-> from the SQL Editor, then set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
-> (Project Settings → API). The server uses the service-role key, so it talks to
-> the database directly and bypasses Row Level Security.
-
-Backend scripts:
-
-| Script              | Description                                          |
-| ------------------- | ---------------------------------------------------- |
-| `npm run start:dev` | Run with hot-reload via ts-node-dev.                 |
-| `npm run build`     | Compile TypeScript to `dist/`.                       |
-| `npm start`         | Compile and run the production build.                |
-
-### Frontend
-
-```bash
-cd frontend
-npm install
+cp .env.example .env   # then fill in the values below
 npm run dev            # starts the app on http://localhost:5173
 ```
+
+Frontend environment variables (`frontend/.env`):
+
+| Variable                 | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `VITE_SUPABASE_URL`      | Supabase project URL (e.g. `https://xxxx.supabase.co`).|
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon/publishable key (safe in the frontend).  |
 
 Frontend scripts:
 
 | Script            | Description                          |
 | ----------------- | ------------------------------------ |
 | `npm run dev`     | Start the Vite dev server.           |
-| `npm run build`   | Build for production.                |
+| `npm run build`   | Build for production (`dist/`).      |
 | `npm run preview` | Preview the production build.        |
 | `npm run lint`    | Run ESLint.                          |
 
-The frontend talks to the backend API at `http://localhost:5000/api` by
-default. To point it elsewhere, set `VITE_API_URL` in a `frontend/.env` file:
+## How it works
 
-```
-VITE_API_URL=http://localhost:5000/api
-```
+### Auth
+
+Authentication is handled entirely by **Supabase Auth**:
+
+- **Google** — `supabase.auth.signInWithOAuth({ provider: "google" })`.
+- **Email/password** — `supabase.auth.signUp` / `signInWithPassword`.
+
+`AuthContext` tracks the session via `getSession()` + `onAuthStateChange`, so
+the UI reacts to login, logout, token refresh, and the OAuth redirect.
 
 ### Shopping & accounts
 
@@ -93,34 +87,33 @@ real details). The fields are validated (16-digit card number, name, a
 non-expired `MM/YY` date, and a 3–4 digit CVC) and the **Pay** button stays
 disabled until they're all valid. Paying shows an order confirmation.
 
-After paying, a **receipt page** confirms the order (reference, items, total)
-with options to return home, share, and — for guests — log in to save it.
-Logging in is optional: a guest's order is stashed locally and saved to their
-account on login, after which signed-in users can review their past orders on
-the **Orders** page. The JWT is stored in `localStorage` and sent on
-authenticated requests.
+After paying, a **receipt page** confirms the order (reference, items, total).
+A guest's order is stashed locally and saved to their account on login, after
+which signed-in users can review their past orders on the **Orders** page.
 
-## API
+### Data
 
-Base URL: `http://localhost:5000`
+Orders and the saved cart live in Supabase tables and are read/written directly
+from the frontend with the anon key. **Row Level Security** restricts every row
+to its owner (`auth.uid() = user_id`):
 
-| Method | Endpoint             | Auth | Description                     |
-| ------ | -------------------- | ---- | ------------------------------- |
-| POST   | `/api/user/register` | No   | Register a new user.            |
-| POST   | `/api/user/login`    | No   | Log in and receive a JWT token. |
-| POST   | `/api/cart/create`   | Yes  | Create a cart for the user.     |
-| GET    | `/api/cart/user`     | Yes  | Get the current user's cart.    |
-| PUT    | `/api/cart/user`     | Yes  | Update the current user's cart. |
-| POST   | `/api/orders`        | Yes  | Place an order for the user.    |
-| GET    | `/api/orders`        | Yes  | List the user's past orders.    |
+- `orders` — `{ reference, items, total, created_at }` per user.
+- `carts` — one row per user holding the saved `flavours`.
 
-Authenticated requests must include the JWT in an `auth-token` header.
-Passwords must be at least 8 characters and include a number and a symbol.
+## Deployment
+
+The frontend is a static build deployed to **Netlify**.
+
+- Build command: `npm run build` (base directory `frontend/`), publish `dist/`.
+- A `_redirects` rule (`/* /index.html 200`) makes client-side routes work on
+  reload — see [`frontend/public/_redirects`](frontend/public/_redirects).
+- Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as build environment
+  variables (or bake them in at build time).
 
 ## Tech stack
 
-- **Frontend:** React, Vite, Tailwind CSS, React Router, Framer Motion, Axios
-- **Backend:** Express, TypeScript, Supabase (Postgres), JWT, bcrypt, Joi
+- **Frontend:** React, Vite, Tailwind CSS, React Router, Framer Motion
+- **Backend-as-a-service:** Supabase (Postgres, Auth, Row Level Security)
 
 ## Development workflow
 
