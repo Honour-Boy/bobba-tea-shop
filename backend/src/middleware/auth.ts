@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { setting } from '../config/config';
-import { Schema } from 'mongoose';
 
 export interface UserPayload {
 	userDetails: {
 		email: string;
-		id: Schema.Types.ObjectId;
+		id: string;
 	};
 	iat: number;
 	exp: number;

@@ -1,0 +1,12 @@
+# Netlify config for the bobba-tea-shop monorepo.
+# The deployable site is the Vite/React app in frontend/.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback so client-side (react-router) routes resolve on reload/deep-link.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

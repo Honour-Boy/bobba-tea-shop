@@ -1,8 +1,7 @@
 import { Response } from 'express';
 import {requestWithUserData} from "../middleware/auth";
-import {createCart, displayCart} from '../dal/carts';
-import { cartStructure, Cart } from '../models/cart';
-import { Schema } from 'mongoose';
+import {createCart, displayCart, updateCart} from '../dal/carts';
+import { cartStructure, cartFlavour } from '../models/cart';
 
 export const create = async (req: requestWithUserData, res: Response): Promise<void> => {
     if (req.currentUser){
@@ -52,16 +51,8 @@ export const display = async (req: requestWithUserData, res: Response): Promise<
 export const update = async (req: requestWithUserData, res: Response): Promise<void> => {
     if (req.currentUser){
         const user = req.currentUser.userDetails.id;
-        const flavours: [{flavour:Schema.Types.ObjectId, name:string, count: number}] = req.body.flavours;
-        await Cart.findOneAndUpdate(
-            { user },
-            { $set: { flavours: [] } },
-          );
-        const cart = await Cart.findOneAndUpdate(
-            { user },
-            { $push: { flavours: { $each: flavours } } },
-            { new: true }
-          );
+        const flavours: cartFlavour[] = req.body.flavours;
+        const cart = await updateCart(user, flavours);
         res.status(200).send(cart);
     }
     else{
