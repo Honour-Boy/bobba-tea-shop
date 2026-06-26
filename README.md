@@ -2,6 +2,8 @@
 
 A full-stack boba tea shop web app — a React + Vite frontend and an Express + TypeScript + MongoDB API.
 
+**🔗 Live demo:** https://bobba-shop.netlify.app
+
 ## Project structure
 
 ```
