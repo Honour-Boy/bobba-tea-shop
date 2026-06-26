@@ -2,14 +2,12 @@ import { useState } from "react";
 import { styles } from "../../styles";
 import { useNavigate } from "react-router-dom";
 import { logo, google } from "../../assets";
-import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../context/AuthContext";
 import { apiError } from "../../api/client";
-import axios from "axios";
 
 const Form = ({ setMsg, msg, allow, setAllow }) => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, register, loginGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -67,19 +65,14 @@ const Form = ({ setMsg, msg, allow, setAllow }) => {
     }
   }
 
-  const login_google = useGoogleLogin({
-    onSuccess: async (response) => {
-      const res = await axios.get(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
-        {
-          headers: {
-            Authorization: `Bearer ${response.access_token}`,
-          },
-        }
-      );
-      console.log(res.data);
-    },
-  });
+  async function login_google() {
+    try {
+      // Redirects to Google, then back to /menu where the session is picked up.
+      await loginGoogle();
+    } catch (err) {
+      setMessage(apiError(err));
+    }
+  }
 
   const headings = allow ? (
     <div className="mt-20">

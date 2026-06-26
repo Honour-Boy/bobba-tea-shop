@@ -1,5 +1,7 @@
 backend/dist
 backend/node_modules
 backend/.env
+frontend/.env
+.env
 # Ignore node_modules
 node_modules/
