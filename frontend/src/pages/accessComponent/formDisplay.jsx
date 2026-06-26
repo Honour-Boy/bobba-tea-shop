@@ -3,7 +3,7 @@ import { styles } from "../../styles";
 import { useNavigate } from "react-router-dom";
 import { logo, google } from "../../assets";
 import { useAuth } from "../../context/AuthContext";
-import { apiError } from "../../api/client";
+import { apiError } from "../../api/errors";
 
 const Form = ({ setMsg, msg, allow, setAllow }) => {
   const navigate = useNavigate();
